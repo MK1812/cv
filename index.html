@@ -8,15 +8,612 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
-    <title>Hello, world!</title>
+    <title>CRM</title>
+    <style>
+      body { padding-bottom: 72px; }
+      .view.d-none { display: none !important; }
+      .navbar .nav-link.active { font-weight: 600; color: #0d6efd !important; }
+      .form-section-title { font-size: 1.1rem; font-weight: 600; }
+      .table-fixed-head thead th { position: sticky; top: 0; background: #fff; z-index: 1; }
+      .kpi-card { min-width: 180px; }
+    </style>
   </head>
   <body>
-    <h1>Hello, world!</h1>
+    <div class="container py-3 pb-5" id="app">
+      <div id="view-dashboard" class="view">
+        <div class="d-flex flex-wrap">
+          <div class="card shadow-sm mr-3 mb-3 kpi-card">
+            <div class="card-body">
+              <div class="form-section-title mb-1">Total Leads</div>
+              <div id="kpi-total-leads" class="display-4">0</div>
+            </div>
+          </div>
+          <div class="card shadow-sm mr-3 mb-3 kpi-card">
+            <div class="card-body">
+              <div class="form-section-title mb-1">Total Visits</div>
+              <div id="kpi-total-visits" class="display-4">0</div>
+            </div>
+          </div>
+          <div class="card shadow-sm mr-3 mb-3 kpi-card">
+            <div class="card-body">
+              <div class="form-section-title mb-1">New This Week</div>
+              <div id="kpi-leads-week" class="display-4">0</div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-header">Recent Leads</div>
+              <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 300px;">
+                  <table class="table table-sm mb-0 table-fixed-head">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Source</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recent-leads-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-header">Recent Visits</div>
+              <div class="card-body p-0">
+                <div class="table-responsive" style="max-height: 300px;">
+                  <table class="table table-sm mb-0 table-fixed-head">
+                    <thead>
+                      <tr>
+                        <th>Lead</th>
+                        <th>Date</th>
+                        <th>Outcome</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recent-visits-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-leads" class="view d-none">
+        <div class="card shadow-sm mb-4">
+          <div class="card-header">Add New Lead</div>
+          <div class="card-body">
+            <form id="lead-form">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="lead-name">Name</label>
+                  <input type="text" class="form-control" id="lead-name" placeholder="Full name" required>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="lead-email">Email</label>
+                  <input type="email" class="form-control" id="lead-email" placeholder="name@example.com">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="lead-phone">Phone</label>
+                  <input type="tel" class="form-control" id="lead-phone" placeholder="+1 555 123 4567">
+                </div>
+                <div class="form-group col-md-3">
+                  <label for="lead-source">Source</label>
+                  <select id="lead-source" class="form-control">
+                    <option>Website</option>
+                    <option>Referral</option>
+                    <option>Event</option>
+                    <option>Ad</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div class="form-group col-md-3">
+                  <label for="lead-status">Status</label>
+                  <select id="lead-status" class="form-control">
+                    <option>New</option>
+                    <option>Contacted</option>
+                    <option>Qualified</option>
+                    <option>Won</option>
+                    <option>Lost</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="lead-notes">Notes</label>
+                <textarea id="lead-notes" class="form-control" rows="2" placeholder="Notes..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Save Lead</button>
+            </form>
+          </div>
+        </div>
+        <div class="card shadow-sm">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <span>Leads</span>
+            <input id="lead-search" type="search" class="form-control form-control-sm w-50" placeholder="Search name, email, phone">
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 420px;">
+              <table class="table table-sm mb-0 table-fixed-head">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody id="leads-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-visits" class="view d-none">
+        <div class="card shadow-sm mb-4">
+          <div class="card-header">Log a Visit</div>
+          <div class="card-body">
+            <form id="visit-form">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="visit-lead">Lead</label>
+                  <select id="visit-lead" class="form-control" required></select>
+                </div>
+                <div class="form-group col-md-3">
+                  <label for="visit-date">Date</label>
+                  <input id="visit-date" type="date" class="form-control" required>
+                </div>
+                <div class="form-group col-md-3">
+                  <label for="visit-outcome">Outcome</label>
+                  <select id="visit-outcome" class="form-control">
+                    <option>Scheduled</option>
+                    <option>Completed</option>
+                    <option>No Show</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="visit-notes">Notes</label>
+                <textarea id="visit-notes" class="form-control" rows="2" placeholder="Notes..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Save Visit</button>
+            </form>
+          </div>
+        </div>
+        <div class="card shadow-sm">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <span>Visits</span>
+            <input id="visit-search" type="search" class="form-control form-control-sm w-50" placeholder="Filter by lead name">
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 420px;">
+              <table class="table table-sm mb-0 table-fixed-head">
+                <thead>
+                  <tr>
+                    <th>Lead</th>
+                    <th>Date</th>
+                    <th>Outcome</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="visits-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-reports" class="view d-none">
+        <div class="card shadow-sm mb-4">
+          <div class="card-header">Reporting Filters</div>
+          <div class="card-body">
+            <form id="report-form" class="form-inline">
+              <div class="form-group mr-3 mb-2">
+                <label for="report-from" class="mr-2">From</label>
+                <input type="date" id="report-from" class="form-control">
+              </div>
+              <div class="form-group mr-3 mb-2">
+                <label for="report-to" class="mr-2">To</label>
+                <input type="date" id="report-to" class="form-control">
+              </div>
+              <div class="form-group mr-3 mb-2">
+                <label for="report-source" class="mr-2">Source</label>
+                <select id="report-source" class="form-control">
+                  <option value="">All</option>
+                  <option>Website</option>
+                  <option>Referral</option>
+                  <option>Event</option>
+                  <option>Ad</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary mb-2">Run</button>
+            </form>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-header">Leads Summary</div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr>
+                        <th>Metric</th>
+                        <th>Count</th>
+                      </tr>
+                    </thead>
+                    <tbody id="report-leads-summary"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+              <div class="card-header">Visits Summary</div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr>
+                        <th>Metric</th>
+                        <th>Count</th>
+                      </tr>
+                    </thead>
+                    <tbody id="report-visits-summary"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="navbar fixed-bottom navbar-light bg-light border-top">
+      <div class="container d-flex justify-content-around">
+        <a class="nav-link text-center" href="#dashboard" data-target="dashboard">Dashboard</a>
+        <a class="nav-link text-center" href="#leads" data-target="leads">Leads</a>
+        <a class="nav-link text-center" href="#visits" data-target="visits">Visits</a>
+        <a class="nav-link text-center" href="#reports" data-target="reports">Reports</a>
+      </div>
+    </nav>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+    <script>
+      (function() {
+        var STORAGE_KEYS = { leads: 'crm_leads', visits: 'crm_visits' };
+
+        function getNowIso() { return new Date().toISOString(); }
+        function toDateInputValue(date) { return date.toISOString().slice(0, 10); }
+        function parseDateOnly(s) { return s ? new Date(s + 'T00:00:00') : null; }
+
+        function readStorage(key) {
+          try {
+            var raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : [];
+          } catch (e) {
+            return [];
+          }
+        }
+        function writeStorage(key, value) {
+          localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function generateId(prefix) {
+          return prefix + '_' + Math.random().toString(36).slice(2, 9) + '_' + Date.now().toString(36);
+        }
+
+        function getLeads() { return readStorage(STORAGE_KEYS.leads); }
+        function getVisits() { return readStorage(STORAGE_KEYS.visits); }
+        function saveLead(lead) {
+          var leads = getLeads();
+          leads.push(lead);
+          writeStorage(STORAGE_KEYS.leads, leads);
+        }
+        function saveVisit(visit) {
+          var visits = getVisits();
+          visits.push(visit);
+          writeStorage(STORAGE_KEYS.visits, visits);
+        }
+
+        function setActiveNav(target) {
+          var links = document.querySelectorAll('.navbar .nav-link');
+          Array.prototype.forEach.call(links, function(link) {
+            if ((link.getAttribute('data-target') || '') === target) {
+              link.classList.add('active');
+            } else {
+              link.classList.remove('active');
+            }
+          });
+        }
+
+        function showView(name) {
+          var views = ['dashboard', 'leads', 'visits', 'reports'];
+          views.forEach(function(view) {
+            var el = document.getElementById('view-' + view);
+            if (!el) return;
+            if (view === name) { el.classList.remove('d-none'); } else { el.classList.add('d-none'); }
+          });
+          setActiveNav(name);
+        }
+
+        function formatDateTime(iso) {
+          try { var d = new Date(iso); return d.toLocaleString(); } catch (e) { return iso; }
+        }
+        function formatDateOnly(iso) {
+          try { var d = new Date(iso); return d.toLocaleDateString(); } catch (e) { return iso; }
+        }
+
+        function renderKpis() {
+          var leads = getLeads();
+          var visits = getVisits();
+          document.getElementById('kpi-total-leads').textContent = leads.length.toString();
+          document.getElementById('kpi-total-visits').textContent = visits.length.toString();
+
+          var now = new Date();
+          var startOfWeek = new Date(now);
+          var day = now.getDay();
+          var diff = (day === 0 ? -6 : 1 - day); // Monday as start
+          startOfWeek.setDate(now.getDate() + diff);
+          startOfWeek.setHours(0,0,0,0);
+          var countWeek = leads.filter(function(l) { return new Date(l.createdAt) >= startOfWeek; }).length;
+          document.getElementById('kpi-leads-week').textContent = countWeek.toString();
+        }
+
+        function renderRecent() {
+          var leads = getLeads().slice().sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); }).slice(0, 10);
+          var visits = getVisits().slice().sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); }).slice(0, 10);
+          var leadBody = document.getElementById('recent-leads-body');
+          var visitBody = document.getElementById('recent-visits-body');
+          if (leadBody) leadBody.innerHTML = leads.map(function(l) {
+            return '<tr>' +
+              '<td>' + escapeHtml(l.name) + '</td>' +
+              '<td>' + escapeHtml(l.source) + '</td>' +
+              '<td>' + escapeHtml(l.status) + '</td>' +
+              '<td>' + formatDateTime(l.createdAt) + '</td>' +
+            '</tr>';
+          }).join('');
+          if (visitBody) visitBody.innerHTML = visits.map(function(v) {
+            var lead = getLeads().find(function(l) { return l.id === v.leadId; });
+            return '<tr>' +
+              '<td>' + escapeHtml(lead ? lead.name : '—') + '</td>' +
+              '<td>' + formatDateOnly(v.date) + '</td>' +
+              '<td>' + escapeHtml(v.outcome) + '</td>' +
+            '</tr>';
+          }).join('');
+        }
+
+        function escapeHtml(s) {
+          return (s == null ? '' : String(s))
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+
+        function renderLeadsTable(filter) {
+          var leads = getLeads().slice().sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+          if (filter) {
+            var f = filter.toLowerCase();
+            leads = leads.filter(function(l) {
+              return (l.name || '').toLowerCase().includes(f) ||
+                     (l.email || '').toLowerCase().includes(f) ||
+                     (l.phone || '').toLowerCase().includes(f) ||
+                     (l.source || '').toLowerCase().includes(f) ||
+                     (l.status || '').toLowerCase().includes(f);
+            });
+          }
+          var body = document.getElementById('leads-body');
+          if (!body) return;
+          body.innerHTML = leads.map(function(l) {
+            return '<tr>' +
+              '<td>' + escapeHtml(l.name) + '</td>' +
+              '<td>' + escapeHtml(l.email) + '</td>' +
+              '<td>' + escapeHtml(l.phone) + '</td>' +
+              '<td>' + escapeHtml(l.source) + '</td>' +
+              '<td>' + escapeHtml(l.status) + '</td>' +
+              '<td>' + formatDateTime(l.createdAt) + '</td>' +
+            '</tr>';
+          }).join('');
+        }
+
+        function renderVisitLeadOptions() {
+          var select = document.getElementById('visit-lead');
+          if (!select) return;
+          var leads = getLeads().slice().sort(function(a, b) { return a.name.localeCompare(b.name); });
+          if (leads.length === 0) {
+            select.innerHTML = '<option value="" disabled selected>No leads yet</option>';
+          } else {
+            select.innerHTML = leads.map(function(l) {
+              return '<option value="' + l.id + '">' + escapeHtml(l.name) + '</option>';
+            }).join('');
+          }
+        }
+
+        function renderVisitsTable(filter) {
+          var visits = getVisits().slice().sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+          var leads = getLeads();
+          if (filter) {
+            var f = filter.toLowerCase();
+            visits = visits.filter(function(v) {
+              var lead = leads.find(function(l) { return l.id === v.leadId; });
+              var leadName = lead ? lead.name : '';
+              return (leadName || '').toLowerCase().includes(f) || (v.outcome || '').toLowerCase().includes(f);
+            });
+          }
+          var body = document.getElementById('visits-body');
+          if (!body) return;
+          body.innerHTML = visits.map(function(v) {
+            var lead = leads.find(function(l) { return l.id === v.leadId; });
+            return '<tr>' +
+              '<td>' + escapeHtml(lead ? lead.name : '—') + '</td>' +
+              '<td>' + formatDateOnly(v.date) + '</td>' +
+              '<td>' + escapeHtml(v.outcome) + '</td>' +
+              '<td>' + escapeHtml(v.notes || '') + '</td>' +
+            '</tr>';
+          }).join('');
+        }
+
+        function runReports() {
+          var from = parseDateOnly(document.getElementById('report-from').value);
+          var to = parseDateOnly(document.getElementById('report-to').value);
+          if (to) { to.setHours(23,59,59,999); }
+          var source = document.getElementById('report-source').value;
+
+          var leads = getLeads().filter(function(l) {
+            var ok = true;
+            var d = new Date(l.createdAt);
+            if (from && d < from) ok = false;
+            if (to && d > to) ok = false;
+            if (ok && source) ok = (l.source === source);
+            return ok;
+          });
+          var visits = getVisits().filter(function(v) {
+            var ok = true;
+            var d = new Date(v.date + 'T00:00:00');
+            if (from && d < from) ok = false;
+            if (to && d > to) ok = false;
+            return ok;
+          });
+
+          var leadsByStatus = leads.reduce(function(acc, l) { acc[l.status] = (acc[l.status] || 0) + 1; return acc; }, {});
+          var leadsBySource = leads.reduce(function(acc, l) { acc[l.source] = (acc[l.source] || 0) + 1; return acc; }, {});
+          var visitsByOutcome = visits.reduce(function(acc, v) { acc[v.outcome] = (acc[v.outcome] || 0) + 1; return acc; }, {});
+
+          var leadRows = [];
+          leadRows.push(row('Total Leads', leads.length));
+          Object.keys(leadsByStatus).sort().forEach(function(k) { leadRows.push(row('Status: ' + k, leadsByStatus[k])); });
+          Object.keys(leadsBySource).sort().forEach(function(k) { leadRows.push(row('Source: ' + k, leadsBySource[k])); });
+          document.getElementById('report-leads-summary').innerHTML = leadRows.join('');
+
+          var visitRows = [];
+          visitRows.push(row('Total Visits', visits.length));
+          Object.keys(visitsByOutcome).sort().forEach(function(k) { visitRows.push(row('Outcome: ' + k, visitsByOutcome[k])); });
+          document.getElementById('report-visits-summary').innerHTML = visitRows.join('');
+
+          function row(label, value) {
+            return '<tr><td>' + escapeHtml(label) + '</td><td>' + value + '</td></tr>';
+          }
+        }
+
+        function initializeDefaults() {
+          if (!localStorage.getItem(STORAGE_KEYS.leads)) writeStorage(STORAGE_KEYS.leads, []);
+          if (!localStorage.getItem(STORAGE_KEYS.visits)) writeStorage(STORAGE_KEYS.visits, []);
+        }
+
+        function setupForms() {
+          var leadForm = document.getElementById('lead-form');
+          if (leadForm) {
+            leadForm.addEventListener('submit', function(e) {
+              e.preventDefault();
+              var lead = {
+                id: generateId('lead'),
+                name: document.getElementById('lead-name').value.trim(),
+                email: document.getElementById('lead-email').value.trim(),
+                phone: document.getElementById('lead-phone').value.trim(),
+                source: document.getElementById('lead-source').value,
+                status: document.getElementById('lead-status').value,
+                notes: document.getElementById('lead-notes').value.trim(),
+                createdAt: getNowIso()
+              };
+              if (!lead.name) { alert('Name is required'); return; }
+              saveLead(lead);
+              leadForm.reset();
+              renderAfterDataChange();
+              alert('Lead saved');
+            });
+          }
+
+          var visitForm = document.getElementById('visit-form');
+          if (visitForm) {
+            visitForm.addEventListener('submit', function(e) {
+              e.preventDefault();
+              var leadId = document.getElementById('visit-lead').value;
+              if (!leadId) { alert('Please select a lead'); return; }
+              var date = document.getElementById('visit-date').value;
+              if (!date) { alert('Please select a date'); return; }
+              var visit = {
+                id: generateId('visit'),
+                leadId: leadId,
+                date: date,
+                outcome: document.getElementById('visit-outcome').value,
+                notes: document.getElementById('visit-notes').value.trim(),
+                createdAt: getNowIso()
+              };
+              saveVisit(visit);
+              visitForm.reset();
+              document.getElementById('visit-date').value = toDateInputValue(new Date());
+              renderAfterDataChange();
+              alert('Visit saved');
+            });
+          }
+
+          var reportForm = document.getElementById('report-form');
+          if (reportForm) {
+            reportForm.addEventListener('submit', function(e) { e.preventDefault(); runReports(); });
+          }
+
+          var leadSearch = document.getElementById('lead-search');
+          if (leadSearch) {
+            leadSearch.addEventListener('input', function() { renderLeadsTable(leadSearch.value); });
+          }
+
+          var visitSearch = document.getElementById('visit-search');
+          if (visitSearch) {
+            visitSearch.addEventListener('input', function() { renderVisitsTable(visitSearch.value); });
+          }
+        }
+
+        function renderAfterDataChange() {
+          renderKpis();
+          renderRecent();
+          renderLeadsTable(document.getElementById('lead-search').value);
+          renderVisitLeadOptions();
+          renderVisitsTable(document.getElementById('visit-search').value);
+          if (!document.getElementById('report-from').value && !document.getElementById('report-to').value) {
+            runReports();
+          }
+        }
+
+        function setupRouting() {
+          function route() {
+            var hash = (location.hash || '#dashboard').slice(1);
+            var target = ['dashboard', 'leads', 'visits', 'reports'].indexOf(hash) >= 0 ? hash : 'dashboard';
+            showView(target);
+          }
+          window.addEventListener('hashchange', route);
+          route();
+        }
+
+        function init() {
+          initializeDefaults();
+          setupRouting();
+          setupForms();
+          var dateInput = document.getElementById('visit-date');
+          if (dateInput) dateInput.value = toDateInputValue(new Date());
+          renderAfterDataChange();
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+      })();
+    </script>
   </body>
 </html>
